@@ -31,21 +31,55 @@ app.get('/', (req, res) => {
 });
 
 //creating user page
-app.get('/api/users', (req, res) => {
-    res.render('displayUsers.ejs', {users});
+app.get('/api/users', async (req, res) => {
+    try {
+        const delay = new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(users);
+            }, 1500);
+        })
+
+        const result = await delay;
+        res.render('displayUsers.ejs', {users:result});
+        processNumOfUsers(showNumOfUsers);
+    }catch(error) {
+        console.log(error);
+        res.status(500).send(`${error}`);
+    }
 })
+
+function showNumOfUsers(num) {
+    console.log('There are ' + num + ' listed users.');
+}
+
+function processNumOfUsers(callback) {
+    const num = users.length;
+    callback(num);
+}
 
 
 //add operations
-app.get('/api/users/add', (req, res) => {
-    res.render('addUsers.ejs', {users});
+app.get('/api/users/add', async (req, res) => {
+    try {
+        const delay = new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(users);
+            }, 1500);
+        })
+
+        const result = await delay;
+        res.render('addUsers.ejs', {users:result});
+    }catch(error) {
+        console.log(error);
+        res.status(500).send(`${error}`);
+    }
 })
 
 app.post('/api/users', (req, res)=>{
 
     console.log(req.body.name);
 
-    const newUser ={
+    const newUser = {
     id:users.length + 1,
     name: req.body.name
     };
@@ -57,8 +91,20 @@ app.post('/api/users', (req, res)=>{
 
 
 //update operations
-app.get('/api/users/update', (req, res) => {
-    res.render('updateUsers.ejs', {users});
+app.get('/api/users/update', async (req, res) => {
+    try {
+        const delay = new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(users);
+            }, 1500);
+        })
+
+        const result = await delay;
+        res.render('updateUsers.ejs', {users:result});
+    }catch(error) {
+        console.log(error);
+        res.status(500).send(`${error}`);
+    }
 })
 
 app.post('/api/users/update/:id', (req, res) => {
@@ -77,8 +123,20 @@ app.post('/api/users/update/:id', (req, res) => {
 })
 
 //delete operations
-app.get('/api/users/delete', (req, res) => {
-    res.render('deleteUsers.ejs', {users});
+app.get('/api/users/delete', async (req, res) => {
+    try {
+        const delay = new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(users);
+            }, 1500);
+        })
+
+        const result = await delay;
+        res.render('deleteUsers.ejs', {users:result});
+    }catch(error) {
+        console.log(error);
+        res.status(500).send(`${error}`);
+    }
 })
 
 app.post('/api/users/delete/:id', (req, res) => {

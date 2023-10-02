@@ -21,3 +21,12 @@
   * can now create new users
   * can now update user names
   * can now delete users
+
+MINI-PROJECT-4 CHANGES:
+- created promises for GET requests
+  * error handling with try/catch blocks
+- Added callback method that logs how many users have been listed whenever opening the users page
+- The Node.js event loop is a constant loop that will read your code, find all the tasks that need to be completed and then completes them. Once it
+  completes these tasks, it waits for new tasks to come in. If there is a delay for some tasks then it will wait to complete them until the specifed amount of time is over.
+  For example, if you have a task in a function that has a 1 second delay on it and a task following that one that doesn't, the second task will be completed first because it gets added to the list of tasks
+  that the event loop has to complete first whereas the first task waited a second to be added.
