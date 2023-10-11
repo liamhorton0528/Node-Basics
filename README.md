@@ -30,3 +30,16 @@ MINI-PROJECT-4 CHANGES:
   completes these tasks, it waits for new tasks to come in. If there is a delay for some tasks then it will wait to complete them until the specifed amount of time is over.
   For example, if you have a task in a function that has a 1 second delay on it and a task following that one that doesn't, the second task will be completed first because it gets added to the list of tasks
   that the event loop has to complete first whereas the first task waited a second to be added.
+
+MINI-PROJECT-5 CHANGES:
+- Created react app
+- React app features class and functional components
+- JSX that prints "User List" at the top of the screen
+- class component stores user info, contains a button handler and lists the users
+- button added that gives the user the option to empty the list
+
+ISSUES:
+- I didn't know how to use the API in the starter example as I didn't get any data back from the call
+- i tried running the express app simultaneously with the react app to see if they just needed to be running together, even changing the port
+  for the express app to make sure there weren't any issues with both projects running on the same port (only the express app would work when they were on the same port)
+- I didn't add any conditional rendering as it wasn't in the notes and I'mm not sure how to do it
