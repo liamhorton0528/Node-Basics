@@ -39,3 +39,16 @@ MINI-PROJECT-5 CHANGES:
     + list user data with map function
     + creates refresh button that refreshes the data being listed
   * uses functional component when listing users
+ 
+MINI-PROJECT-6 CHANGES:
+- Added StepTrackerApp.js
+  * prints a header, step count and button that allows the user to increase the counted steps
+  * has conditional rendering that prints that the user has reached their step goal once they hit 10 steps or higher
+  * manages complex state with useStepTracker
+- Added useStepTracker.js
+  * manages step state
+  * makes changes to window title as steps increase
+  * uses custom hook to increase steps on button click
+- Modified index.js
+  * imported StepTracker component
+  * Replaced render component from App to StepTracker
