@@ -32,14 +32,10 @@ MINI-PROJECT-4 CHANGES:
   that the event loop has to complete first whereas the first task waited a second to be added.
 
 MINI-PROJECT-5 CHANGES:
-- Created react app
-- React app features class and functional components
-- JSX that prints "User List" at the top of the screen
-- class component stores user info, contains a button handler and lists the users
-- button added that gives the user the option to empty the list
-
-ISSUES:
-- I didn't know how to use the API in the starter example as I didn't get any data back from the call
-- i tried running the express app simultaneously with the react app to see if they just needed to be running together, even changing the port
-  for the express app to make sure there weren't any issues with both projects running on the same port (only the express app would work when they were on the same port)
-- I didn't add any conditional rendering as it wasn't in the notes and I'mm not sure how to do it
+- created react app within the existing project:
+  * uses JSX to print title "User List"
+  * uses component with internal state to:
+    + fetch user data
+    + list user data with map function
+    + creates refresh button that refreshes the data being listed
+  * uses functional component when listing users

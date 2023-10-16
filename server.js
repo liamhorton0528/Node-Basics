@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 3000;
+const port = 3001;
 const methodOverride = require('method-override');
 
 app.use(express.urlencoded());
@@ -31,7 +31,7 @@ app.get('/', (req, res) => {
 });
 
 //creating user page
-app.get('/api/users', async (req, res) => {
+/* app.get('/api/users', async (req, res) => {
     try {
         const delay = new Promise((resolve) => {
             setTimeout(() => {
@@ -46,6 +46,11 @@ app.get('/api/users', async (req, res) => {
         console.log(error);
         res.status(500).send(`${error}`);
     }
+}) */
+
+app.get('/api/users', (req, res) => {
+    console.log(users);
+    res.json(users);
 })
 
 function showNumOfUsers(num) {

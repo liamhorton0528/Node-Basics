@@ -1,49 +1,56 @@
-import React from 'react';
-
-const title = <h2>User List:</h2>;
-
-class app extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      users: [
-        {
-          "id": 1,
-          "name": "John"
-        },
-        {
-          "id": 2,
-          "name": "Jane"
-        }
-      ]
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+ 
+// Functional component
+const App = () => {
+  const [users, setUsers] = useState([]); // State for users
+ 
+  // Fetch users from API
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+ 
+ 
+ 
+ 
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch('api/users');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log(data);
+      setUsers(data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
     }
-  }
+  };
 
-  buttonHandler = () => {
-    this.setState({users: []});
+  // Event handler for refreshing users
+  const handleRefresh = () => {
+    fetchUsers(); 
   }
+  
+  const title = <h1>User List</h1>;
+  
+  return (
+    <div>
+      {title}
+      <button onClick={handleRefresh}>Refresh</button>
+      <ul>
+      {users.map(user => (
+    <li key={user.id}><DisplayUsers name={user.name} id={user.id}/></li>
+  ))}
+      </ul>
+    </div>
+  );
+};
 
-  render() {
-    return(
-      <div>
-        {title}
-        <ul>
-        {this.state.users.map(
-            (user) => (
-              <li key={user.id}><User id={user.id} name={user.name}/></li>
-            )
-        )}
-        </ul>
-        <button onClick={this.buttonHandler}>Empty List</button>
-      </div>
-    );
-  }
-}
-
-function User(props) {
+function DisplayUsers(props) {
   return(
-    <div>ID: {props.id} <br/> Name: {props.name}</div>
-  )
+    <div>Name: {props.name}, ID: {props.id}</div>
+  );
 }
-
-export default app;
+ 
+export default App;
