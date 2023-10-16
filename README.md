@@ -30,7 +30,6 @@ MINI-PROJECT-4 CHANGES:
   completes these tasks, it waits for new tasks to come in. If there is a delay for some tasks then it will wait to complete them until the specifed amount of time is over.
   For example, if you have a task in a function that has a 1 second delay on it and a task following that one that doesn't, the second task will be completed first because it gets added to the list of tasks
   that the event loop has to complete first whereas the first task waited a second to be added.
-- Also realized I've been uploading stuff to github wrong this whole time so you will probably notice the folders being a little messed up
 
 MINI-PROJECT-5 CHANGES:
 - created react app within the existing project:
