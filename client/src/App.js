@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+
  
 // Functional component
 const App = () => {
@@ -10,10 +11,7 @@ const App = () => {
     fetchUsers();
   }, []);
  
- 
- 
- 
-  const fetchUsers = async () => {
+ const fetchUsers = async () => {
     try {
       const response = await fetch('api/users');
       if (!response.ok) {
@@ -31,6 +29,10 @@ const App = () => {
   const handleRefresh = () => {
     fetchUsers(); 
   }
+
+  const handleClear = () => {
+    setUsers([]);
+  }
   
   const title = <h1>User List</h1>;
   
@@ -38,18 +40,20 @@ const App = () => {
     <div>
       {title}
       <button onClick={handleRefresh}>Refresh</button>
+      <button onClick={handleClear}>Clear list</button>
       <ul>
       {users.map(user => (
     <li key={user.id}><DisplayUsers name={user.name} id={user.id}/></li>
   ))}
       </ul>
+      {users.length > 0 && <p>There are {users.length} users listed</p>}
     </div>
   );
 };
 
 function DisplayUsers(props) {
   return(
-    <div>Name: {props.name}, ID: {props.id}</div>
+    <div>Name: {props.name} <br/> ID: {props.id}</div>
   );
 }
  
