@@ -13,7 +13,7 @@ const App = () => {
  
  const fetchUsers = async () => {
     try {
-      const response = await fetch('api/users');
+      const response = await fetch('/api/users');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -30,9 +30,9 @@ const App = () => {
     fetchUsers(); 
   }
 
-  const handleClear = () => {
-    setUsers([]);
-  }
+  // const handleClear = () => {
+  //   setUsers([]);
+  // }
   
   const title = <h1>User List</h1>;
   
@@ -40,20 +40,25 @@ const App = () => {
     <div>
       {title}
       <button onClick={handleRefresh}>Refresh</button>
-      <button onClick={handleClear}>Clear list</button>
+      {/* <button onClick={handleClear}>Clear list</button> */}
       <ul>
       {users.map(user => (
-    <li key={user.id}><DisplayUsers name={user.name} id={user.id}/></li>
+    <li key={user.id}><DisplayUsers name={user.name}/></li>
   ))}
       </ul>
       {users.length > 0 && <p>There are {users.length} users listed</p>}
+      <form method='POST' action='/api/users'>
+        <label>Enter name for new user:</label>
+        <input name='name' id='name'/>
+        <button type='submit'>Submit</button>
+      </form>
     </div>
   );
 };
 
 function DisplayUsers(props) {
   return(
-    <div>Name: {props.name} <br/> ID: {props.id}</div>
+    <div>Name: {props.name}</div>
   );
 }
  
