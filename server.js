@@ -24,7 +24,6 @@ db.once('open', function() {
 });
 
 const userSchema = new mongoose.Schema({
-    id: Number,
     name: String
 }, {collection: 'userlist'});
 
@@ -107,70 +106,6 @@ app.post('/api/users', async (req, res)=>{
     }catch(err){
         console.log(err);
         res.status(500).send('Error saving to database');
-    }
-})
-
-
-//update operations
-app.get('/api/users/update', async (req, res) => {
-    try {
-        const delay = new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(users);
-            }, 1500);
-        })
-
-        const result = await delay;
-        res.render('updateUsers.ejs', {users:result});
-    }catch(error) {
-        console.log(error);
-        res.status(500).send(`${error}`);
-    }
-})
-
-app.post('/api/users/update/:id', (req, res) => {
-    const userId = parseInt(req.params.id);
-    const newName = req.body.name;
-
-    const user = users.find(u => u.id === userId);
-
-    if(user) {
-        user.name = newName;
-        res.redirect('/api/users/update');
-    }
-    else {
-        res.status(404).send(`User with ID: ${userId} not found`);
-    }
-})
-
-//delete operations
-app.get('/api/users/delete', async (req, res) => {
-    try {
-        const delay = new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(users);
-            }, 1500);
-        })
-
-        const result = await delay;
-        res.render('deleteUsers.ejs', {users:result});
-    }catch(error) {
-        console.log(error);
-        res.status(500).send(`${error}`);
-    }
-})
-
-app.post('/api/users/delete/:id', (req, res) => {
-    const userId = parseInt(req.params.id);
-
-    const index = users.findIndex(u => u.id === userId);
-
-    if(index !== -1) {
-        users.splice(index, 1);
-        res.redirect('/api/users/delete');
-    }
-    else {
-        res.status(404).send(`User with ID ${userId} not found.`);
     }
 })
 
