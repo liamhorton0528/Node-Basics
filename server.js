@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const port = 3001;
 const methodOverride = require('method-override');
+const mongoose = require('mongoose');
 
 app.use(express.urlencoded());
 app.use(express.json());
@@ -13,10 +14,21 @@ console.log(`${req.method} request for ${req.url}`);
 next();
 });
 
-const users = [
-    {id: 1, name: 'John'},
-    {id: 2, name: 'Jane'},
-]
+//MongoDB connection
+mongoose.connect('mongodb+srv://liamhorton:mp7password@mp7cluster.adazzly.mongodb.net/UserDB', { useNewUrlParser: true, useUnifiedTopology: true });
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log('Connected to MongoDB');
+});
+
+const userSchema = new mongoose.Schema({
+    id: Number,
+    name: String
+}, {collection: 'userlist'});
+
+const User = mongoose.model('User', userSchema);
 
 
 //creating home page
@@ -48,9 +60,14 @@ app.get('/', (req, res) => {
     }
 }) */
 
-app.get('/api/users', (req, res) => {
-    console.log(users);
-    res.json(users);
+app.get('/api/users', async (req, res) => {
+    try{
+        const users = await User.find();
+        res.json(users);
+    }catch(err){
+        console.log(err);
+        res.status(500).send('Error fetching from database');
+    }
 })
 
 function showNumOfUsers(num) {
@@ -80,18 +97,17 @@ app.get('/api/users/add', async (req, res) => {
     }
 })
 
-app.post('/api/users', (req, res)=>{
+app.post('/api/users', async (req, res)=>{
+    const newUser = new User({name: req.body.name});
 
-    console.log(req.body.name);
-
-    const newUser = {
-    id:users.length + 1,
-    name: req.body.name
-    };
-
-    users.push(newUser);
-    res.redirect('/api/users/add');
-
+    try{
+        const result = await newUser.save();
+        console.log('saved to database:', result);
+        res.redirect('/api/users');
+    }catch(err){
+        console.log(err);
+        res.status(500).send('Error saving to database');
+    }
 })
 
 
