@@ -1,7 +1,14 @@
-MINI-PROJECT-7 CHANGES:
-- Created a database with mongoose
-- Created schema for user object
-- Edited "/api/users" GET endpoint to get data from database rather than from the file
-- Edited "/api/users" POST endpoint to create a new user using the user schema and upload it to our database
-- Added option for user to add a user to the list
+MINI-PROJECT-8 CHANGES:
+- Added validation for any process that passed along data to be stored in the database
+- created update endpoint
+  * new UI for user to update user
+  * validates data being received
+  * finds user that is to be updated
+  * changes user's name
+  * saves changes to the database
+- created delete endpoint
+  * new UI for user to delete user
+  * receives user id
+  * finds user with id
+  * deletes the user
 
