@@ -43,7 +43,7 @@ const App = () => {
       {/* <button onClick={handleClear}>Clear list</button> */}
       <ul>
       {users.map(user => (
-    <li key={user.id}><DisplayUsers name={user.name}/></li>
+    <li><DisplayUsers name={user.name} id={user._id}/></li>
   ))}
       </ul>
       {users.length > 0 && <p>There are {users.length} users listed</p>}
@@ -58,7 +58,20 @@ const App = () => {
 
 function DisplayUsers(props) {
   return(
-    <div>Name: {props.name}</div>
+    <div>
+      <div>Name: {props.name}</div>
+      <form method='POST' action='/api/users/update'>
+        <label>Change name of user: </label>
+        <input name='newName' />
+        <input hidden name='id' value={props.id}/>
+        <button type="submit">Submit</button>
+        <br />
+      </form>
+      <form method='POST' action='/api/users/delete'>
+        <input hidden name='id' value={props.id}/>
+        <button type='submit'>Delete this user</button>
+      </form>
+    </div>
   );
 }
  
