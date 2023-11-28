@@ -1,0 +1,26 @@
+<h1>User List</h1>
+<% if (account) { %> 
+    <h4>Hello <%= account.username %></h4>
+    <button><a href="/logout">Logout</a></button>
+<% } else { %>
+    <button><a href="/register">Register</a></button>
+    <button><a href="/login">Login</a></button>
+    <br/><br/>
+<% } %>
+
+<% for(i=0; i < users.length; i++) { %> 
+    <div>
+        <div>Name: <%= users[i].name %></div>
+        <form method='POST' action='/api/users/update'>
+            <label>Change name of user: </label>
+            <input name='newName' />
+            <input hidden name='id' value={users[i].id}/>
+            <button type="submit">Submit</button>
+            <br />
+        </form>
+        <form method='POST' action='/api/users/delete'>
+            <input hidden name='id' value={users[i].id}/>
+            <button type='submit'>Delete this user</button>
+        </form>
+    </div>
+<% } %>
