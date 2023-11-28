@@ -1,18 +1,28 @@
-const express = require('express');
+import express from 'express';
+import methodOverride from 'method-override';
+import mongoose from 'mongoose';
+import {body, validationResult} from 'express-validator';
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import bcrypt from 'bcryptjs';
+import session from 'express-session';
+import 'dotenv/config';
+
 const app = express();
 const port = 3001;
-const methodOverride = require('method-override');
-const mongoose = require('mongoose');
-const {body, validationResult} = require('express-validator');
 
 app.use(express.urlencoded());
 app.use(express.json());
 app.set('view engine', 'ejs');
 app.use(methodOverride('_method'));
-app.use((req,res,next) =>{
-console.log(`${req.method} request for ${req.url}`);
-next();
-});
+app.use(session({
+    secret: "Humber",
+    resave: false,
+    saveUninitialized: true,
+    cookue: {secure: false}
+  }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 //MongoDB connection
 mongoose.connect('mongodb+srv://liamhorton:mp7password@mp7cluster.adazzly.mongodb.net/UserDB', { useNewUrlParser: true, useUnifiedTopology: true });
@@ -23,24 +33,101 @@ db.once('open', function() {
   console.log('Connected to MongoDB');
 });
 
+// setting up passport
+passport.use(new LocalStrategy(
+    async (username, password, done) => {
+        const account = await Account.findOne({username: username});
+        console.log(account + "1");
+        if(!account || !bcrypt.compareSync(password, account.password)) {
+            return done(null, false, {message: 'Incorrect username or password'});
+        }
+        return done(null, account);
+    }
+));
+
+passport.serializeUser((account, done) => {
+    done(null, account.id);
+    console.log(account + "2")
+});
+
+passport.deserializeUser((id, done) => {
+    Account.findById(id).then(account => {
+        done(null, account);
+        console.log(account + "3")
+    }).catch(err => {
+        done(err);
+    });
+});
+
 const userSchema = new mongoose.Schema({
     name: String
 }, {collection: 'userlist'});
 
 const User = mongoose.model('User', userSchema);
 
+const accountSchema = new mongoose.Schema({
+    username: String,
+    password: String
+}, {collection: 'accounts'});
 
-//creating home page
-app.get('/', (req, res) => {
-    res.send(`<h1>User Manipulation</h1>
-             <div>
-                <button ><a href="/api/users">See users</a></button>
-                <button ><a href="/api/users/add">Add users</a></button>
-                <button ><a href="/api/users/update">Update users</a></button>
-                <button ><a href="/api/users/delete">Delete users</a></button>
-              </div>`);
+const Account = mongoose.model('Account', accountSchema);
+
+app.use((req,res,next) =>{
+    console.log(`${req.method} request for ${req.url}`);
+    next();
+    });
+
+//registration endpoint
+app.get('/register', (req, res) => {
+    res.render('register.ejs');
+})
+
+app.post('/register', async (req, res) => {
+    try {
+        const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+        const newAccount = new Account({username: req.body.username, password: hashedPassword});
+        await newAccount.save();
+        res.redirect('/login');
+    }
+    catch(error) {
+        console.error(error);
+        res.redirect('/register');
+    }
 });
 
+//login endpoint
+app.get('/login', (req, res) => {
+    res.render('login.ejs');
+})
+
+app.post('/login', passport.authenticate('local', {failureRedirect: '/login', failureMessage: true, successMessage:true}), (req, res) => {
+    console.log(req.account + "4");
+    res.redirect('/');
+})
+
+//logout endpoint
+app.post('/logout', (req, res) => {
+    req.logout(function(err) {
+        if(err) {
+            return next(err);
+        }
+        res.redirect('/');
+    })
+})
+
+
+
+app.get('/', async (req, res) => {
+    try{
+        const users = await User.find();
+        res.render('home.ejs', {users: users, account: req.account})
+    }catch(err){
+        console.log(err);
+        res.status(500).send('Error fetching from database');
+    }
+});
+
+//returns json from userlist collection in database
 app.get('/api/users', async (req, res) => {
     try{
         const users = await User.find();
