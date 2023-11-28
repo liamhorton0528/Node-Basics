@@ -2,6 +2,7 @@ MINI-PROJECT-9 CHANGES:
 
 REMOVED:
 - old ejs files for user CRUD operation
+- users.json
 
 ADDED:
 - ejs files for home, register, login and logout pages
