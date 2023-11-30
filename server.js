@@ -18,8 +18,7 @@ app.use(methodOverride('_method'));
 app.use(session({
     secret: "Humber",
     resave: false,
-    saveUninitialized: true,
-    cookue: {secure: false}
+    saveUninitialized: true
   }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -101,7 +100,7 @@ app.get('/login', (req, res) => {
 })
 
 app.post('/login', passport.authenticate('local', {failureRedirect: '/login', failureMessage: true, successMessage:true}), (req, res) => {
-    console.log(req.account + "4");
+    console.log(req.user + " account");
     res.redirect('/');
 })
 
@@ -120,7 +119,9 @@ app.post('/logout', (req, res) => {
 app.get('/', async (req, res) => {
     try{
         const users = await User.find();
-        res.render('home.ejs', {users: users, account: req.account})
+        console.log(users);
+        console.log(req.account);
+        res.render('home.ejs', {users: users, account: req.user})
     }catch(err){
         console.log(err);
         res.status(500).send('Error fetching from database');
