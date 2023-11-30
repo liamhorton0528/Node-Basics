@@ -1,7 +1,10 @@
 <h1>User List</h1>
 <% if (account) { %> 
     <h4>Hello <%= account.username %></h4>
-    <button><a href="/logout">Logout</a></button>
+    <form action="/logout" method="POST">
+        <button type="submit">Logout</button>
+    </form>
+    <br/>
 <% } else { %>
     <button><a href="/register">Register</a></button>
     <button><a href="/login">Login</a></button>
