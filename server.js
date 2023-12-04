@@ -209,15 +209,21 @@ app.post('/api/users/update', ensureAuthenticated, [body('newName').isLength({mi
 
 //delete
 app.post('/api/users/delete', ensureAuthenticated, async (req, res) => {
-    const userID = req.body.id;
-    const doc = await User.findById(userID);
+    try {
+        const userID = req.body.id;
+        const doc = await User.findById(userID);
 
-    if(!doc.posted_by.equals(req.user._id)) {
-        res.status(500).send('You are not the one who added this user so you may not delete them.');
+        if(!doc.posted_by.equals(req.user._id)) {
+            res.status(500).send('You are not the one who added this user so you may not delete them.');
+        }
+
+        await doc.deleteOne();
+        res.redirect('/');
     }
-
-    await doc.deleteOne();
-    res.redirect('/');
+    catch (err) {
+        console.log(err);
+        res.status(500).send('Error deleting user');
+    }
 })
 
 function showNumOfUsers(num) {
