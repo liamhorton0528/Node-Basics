@@ -1,29 +1,13 @@
 MINI-PROJECT-9 CHANGES:
 
-REMOVED:
-- old ejs files for user CRUD operation
-- users.json
-
-ADDED:
-- ejs files for home, register, login and logout pages
-- home is a substitute for our react front end
-- register, login and logout are forms to complete their respective operations
-
 UPDATED:
-- package.json to have more needed modules and to use ES modules instead of require
+- package.json to have more needed modules
 - server.js
-  + changed require modules to be imported
-  + created session
-  + created passport with strategy to authenticate user login
-  + created new account schema for logins
-  + added get and post endpoint for registration
-    * get renders register.ejs
-    * post creates new account, saves it to the database and redirects to login. if error, redirect to register page
-  + added get and post endpoint for login
-    * get renders login.ejs
-    * post authenticates login details and redirects to home. if account doesn't exist, redirect to login page
-  + added post endpoint for logout
-    * account is logged out, redirected to home page
+  + added access control middleware for adding users, updating users and deleting users
+  + added posted_by to User schema to keep track of who added which user
+  + added verification when updating and deleting users so only the person who posted the user can update/delete them
+- home.ejs
+  + fixed values in the update and delete forms as they were not holding certain values before
 
  HOW TO RUN:
  - for react app:
