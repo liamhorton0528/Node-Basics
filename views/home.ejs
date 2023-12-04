@@ -17,13 +17,18 @@
         <form method='POST' action='/api/users/update'>
             <label>Change name of user: </label>
             <input name='newName' />
-            <input hidden name='id' value={users[i].id}/>
+            <input hidden name='id' value="<%= users[i]._id%>"/>
             <button type="submit">Submit</button>
             <br />
         </form>
         <form method='POST' action='/api/users/delete'>
-            <input hidden name='id' value={users[i].id}/>
+            <input hidden name='id' value="<%= users[i]._id%>"/>
             <button type='submit'>Delete this user</button>
         </form>
     </div>
 <% } %>
+<form method='POST' action='/api/users'>
+    <label>Enter name for new user:</label>
+    <input name='name' id='name'/>
+    <button type='submit'>Submit</button>
+</form>
