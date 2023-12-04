@@ -7,6 +7,8 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import bcrypt from 'bcryptjs';
 import session from 'express-session';
 import 'dotenv/config';
+import jwt from 'jsonwebtoken';
+import cors from 'cors';
 
 const app = express();
 const port = 3001;
@@ -18,10 +20,12 @@ app.use(methodOverride('_method'));
 app.use(session({
     secret: "Humber",
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+    cookie: { secure: false }
   }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(cors());
 
 //MongoDB connection
 mongoose.connect('mongodb+srv://liamhorton:mp7password@mp7cluster.adazzly.mongodb.net/UserDB', { useNewUrlParser: true, useUnifiedTopology: true });
@@ -36,7 +40,7 @@ db.once('open', function() {
 passport.use(new LocalStrategy(
     async (username, password, done) => {
         const account = await Account.findOne({username: username});
-        console.log(account + "1");
+        console.log(account);
         if(!account || !bcrypt.compareSync(password, account.password)) {
             return done(null, false, {message: 'Incorrect username or password'});
         }
@@ -46,20 +50,39 @@ passport.use(new LocalStrategy(
 
 passport.serializeUser((account, done) => {
     done(null, account.id);
-    console.log(account + "2")
 });
 
 passport.deserializeUser((id, done) => {
     Account.findById(id).then(account => {
         done(null, account);
-        console.log(account + "3")
     }).catch(err => {
         done(err);
     });
 });
 
+const ensureAuthenticated = (req, res, next) => {
+    if(req.isAuthenticated()) {
+        return next();
+    }
+    else {
+        res.redirect('/login');
+    }
+};
+
+const verifyToken = (req, res) => {
+    const token = req.header('Authorization')?.split(' ')[1];
+    if(!token) return res.sendStatus(401);
+
+    jwt.verify(token, 'SECRET', (err, user) => {
+        if(err) return res.sendStatus(403);
+        req.user = user;
+        next();
+    });
+};
+
 const userSchema = new mongoose.Schema({
-    name: String
+    name: String,
+    posted_by: mongoose.Schema.Types.ObjectId
 }, {collection: 'userlist'});
 
 const User = mongoose.model('User', userSchema);
@@ -100,7 +123,8 @@ app.get('/login', (req, res) => {
 })
 
 app.post('/login', passport.authenticate('local', {failureRedirect: '/login', failureMessage: true, successMessage:true}), (req, res) => {
-    console.log(req.user + " account");
+    const token = jwt.sign({id: req.user.id}, 'SECRET', {expiresIn: '1h'});
+    res.header('Authorization', `Bearer ${token}`);
     res.redirect('/');
 })
 
@@ -119,8 +143,6 @@ app.post('/logout', (req, res) => {
 app.get('/', async (req, res) => {
     try{
         const users = await User.find();
-        console.log(users);
-        console.log(req.account);
         res.render('home.ejs', {users: users, account: req.user})
     }catch(err){
         console.log(err);
@@ -139,8 +161,9 @@ app.get('/api/users', async (req, res) => {
     }
 })
 
-app.post('/api/users', [body('name').isLength({min: 1})], async (req, res) => {
-    const newUser = new User({name: req.body.name});
+//add user
+app.post('/api/users', ensureAuthenticated, [body('name').isLength({min: 1})], async (req, res) => {
+    const newUser = new User({name: req.body.name, posted_by: req.user._id});
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
         return res.status(400).json({errors: errors.array()});
@@ -149,7 +172,7 @@ app.post('/api/users', [body('name').isLength({min: 1})], async (req, res) => {
     try{
         const result = await newUser.save();
         console.log('saved to database:', result);
-        res.redirect('/api/users');
+        res.redirect('/');
     }catch(err){
         console.log(err);
         res.status(500).send('Error saving to database');
@@ -157,7 +180,7 @@ app.post('/api/users', [body('name').isLength({min: 1})], async (req, res) => {
 })
 
 //update
-app.post('/api/users/update', [body('newName').isLength({min: 1})], async (req, res) => {
+app.post('/api/users/update', ensureAuthenticated, [body('newName').isLength({min: 1})], async (req, res) => {
     const userID = req.body.id;
     const newName = req.body.newName;
     console.log(userID + ' ' + newName);
@@ -167,18 +190,34 @@ app.post('/api/users/update', [body('newName').isLength({min: 1})], async (req, 
         return res.status(400).json({errors: errors.array()});
     }
 
-    const doc = await User.findById(userID);
-    doc.name = newName;
-    await doc.save();
-    res.redirect('/api/users');
+    try {
+        const doc = await User.findById(userID);
+
+        if(!doc.posted_by.equals(req.user._id)) {
+            res.status(500).send('You are not the one who added this user so you may not update them.');
+        }
+
+        doc.name = newName;
+        await doc.save();
+        res.redirect('/');
+    }
+    catch(err) {
+        console.log(err);
+        res.status(500).send('Error updating user');
+    }
 })
 
 //delete
-app.post('/api/users/delete', async (req, res) => {
+app.post('/api/users/delete', ensureAuthenticated, async (req, res) => {
     const userID = req.body.id;
     const doc = await User.findById(userID);
+
+    if(!doc.posted_by.equals(req.user._id)) {
+        res.status(500).send('You are not the one who added this user so you may not delete them.');
+    }
+
     await doc.deleteOne();
-    res.redirect('/api/users');
+    res.redirect('/');
 })
 
 function showNumOfUsers(num) {
@@ -189,7 +228,6 @@ function processNumOfUsers(callback) {
     const num = users.length;
     callback(num);
 }
-
 
 //creating server
 app.listen(port, ()=>{
